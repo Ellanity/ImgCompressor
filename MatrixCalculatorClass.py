@@ -50,24 +50,27 @@ class MatrixCalculator:
             raise Exception("Matrix subtraction is not possible. The sizes of the matrices do not match.")
 
     def multiple(self, matrix_1: Matrix, matrix_2: Matrix):
-        if matrix_1.height == matrix_2.width:
-            matrix_3_size = matrix_1.height
-            matrix_3_elements = [0] * (matrix_3_size * matrix_3_size)
-            for i in range(matrix_3_size):
-                for j in range(matrix_3_size):
-                    for k in range(matrix_3_size):
-                        matrix_3_elements[matrix_3_size * i + j] += matrix_1.matrix[i][k] * matrix_2.matrix[k][j]
-            result = self.Matrix().create(list(matrix_3_elements), matrix_3_size, matrix_3_size)
+        if matrix_1.width == matrix_2.height:
+            matrix_3_elements = [0] * (matrix_1.height * matrix_2.width)
+            matrix_3_width = matrix_2.width
+            matrix_3_height = matrix_1.height
+            matrix_3_common_size = matrix_2.height
+            for i in range(0, matrix_3_height):
+                for j in range(0, matrix_3_width):
+                    for k in range(0, matrix_3_common_size):
+                            matrix_3_elements[matrix_3_width * i + j] += matrix_1.matrix[i][k] * matrix_2.matrix[k][j]
+            result = self.Matrix().create(list(matrix_3_elements), width=matrix_3_width, height=matrix_3_height)
             return result
         else:
-            raise Exception("Matrix multiplication is not possible. The sizes of the matrices do not match.")
+            raise Exception(f"Matrix multiplication is not possible. The sizes of the matrices do not match. "
+                            f"matrix_1 height = {matrix_1.width}, matrix_2 width = {matrix_2.height}")
 
     def multipleNum(self, matrix: Matrix, num):
         new_matrix = [x * num for x in matrix.elements]
         result = self.Matrix().create(new_matrix, matrix.width, matrix.height)
         return result
 
-    def transpose(self, matrix):
+    def transpose(self, matrix: Matrix):
         new_matrix = [0] * (matrix.height * matrix.width)
         for i in range(matrix.height):
             for j in range(matrix.width):
@@ -75,6 +78,12 @@ class MatrixCalculator:
         result = self.Matrix().create(new_matrix, matrix.height, matrix.width)
         return result
 
+    def getListFromMatrix(self, matrix: Matrix):
+        values = []
+        for row in matrix.matrix:
+            for value in row:
+                values.append(value)
+        return values
 
 ##### TESTS #####
 """
@@ -95,5 +104,14 @@ print("")
 calc.transpose(matrix_3).print()
 print("")
 calc.multipleNum(matrix_3, 3.2).print()
+print("")
+calc = MatrixCalculator()
+matrix_4 = calc.Matrix().create([1, 2, 3, 3, 2, 1], 3, 2)
+matrix_5 = calc.Matrix().create([1, -1, -1, 1], 2, 2)
+matrix_4.print()
+print("")
+matrix_5.print()
+print("")
+calc.multiple(matrix_5, matrix_4).print()
 print("")
 """

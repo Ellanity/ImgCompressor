@@ -1,7 +1,10 @@
-import matplotlib.image as Img
-import PIL.Image as PilImg
 import random
 import math
+
+import matplotlib.image as Img
+import PIL.Image as PilImg
+
+from NeuralNetworkClass import NeuralNetwork
 
 
 class ImageCompressor:
@@ -19,6 +22,9 @@ class ImageCompressor:
         self.block_height = 0
         self.blocks = []
 
+        self.nn = NeuralNetwork()
+        self.compressed_blocks = []
+
         self.matrix_of_weights_first = []
         self.matrix_of_weights_second = []
         self.count_of_neurons_on_second_layer = 0
@@ -33,8 +39,10 @@ class ImageCompressor:
         self.__convertValuesInImageArray()
         # convert vector in vector of blocks/vectors
         self.__splitImageArrayIntoBlocks()
-        # make first matrix of weights
-        # self.__createMatrixOfWeights(self.matrix_of_weights_first, self.count_of_neurons_on_second_layer)
+        # work with nn
+        self.__createNN()
+        self.__compressImageWithNN()
+
 
     def __setImageFile(self, image_file_name):
         self.image_file_name = image_file_name
@@ -106,11 +114,11 @@ class ImageCompressor:
         # count of neurons on second layer
         self.count_of_neurons_on_second_layer = len(self.blocks[0]) * 2
 
-    def __createMatrixOfWeights(self, matrix, count_of_neurons_on_second_layer):
-        matrix.clear()
-        for num_of_weight in range(0, count_of_neurons_on_second_layer * len(self.blocks[0])):
-            matrix.append(random.random())
-        print(len(matrix))
+    def __createNN(self):
+        rand_blocks = [random.choice(list(self.blocks)) for _ in range(0, 10)]
+        self.nn.trainNeuronNetwork(list(rand_blocks))
 
-    def __createMatrixOfWeightsOnSecondLayer(self, matrix_first_layer, matrix):
-        pass
+    def __compressImageWithNN(self):
+        self.compressed_blocks = []
+        for block in self.blocks:
+            self.compressed_blocks.append(self.nn.runBlockThroughNN(block))

@@ -1,3 +1,4 @@
+# import statistics
 from copy import copy
 from random import random
 from MatrixCalculatorClass import MatrixCalculator
@@ -11,7 +12,7 @@ class NeuralNetwork:
 
         self.max_allowable_error = 0.7
         self.total_error = 0
-        self.quantity_of_iterarions = 0
+        self.quantity_of_iterations = 0
 
     ##### MICRO NETWORK FUNCTIONS
 
@@ -29,7 +30,7 @@ class NeuralNetwork:
             def __init__(self, value: float):
                 self.value = value
 
-        def __str__ (self):
+        def __str__(self):
             string = ""
             for neuron in self.neurons:
                 string += f"{neuron.value} "
@@ -55,7 +56,7 @@ class NeuralNetwork:
             self.neurons_count_layer_first = self.neural_network.layers[self.layer_id_first].count_of_neurons
             self.neurons_count_layer_second = self.neural_network.layers[self.layer_id_second].count_of_neurons
 
-            self.learning_rate = random() / 100
+            self.learning_rate = random() / 1000
 
         def createMatrix(self, list_of_weights: list):
             values = list_of_weights
@@ -70,7 +71,8 @@ class NeuralNetwork:
 
     def createWeights(self, matrix_of_weights_id: str, layer_id_first: int, layer_id_second: int, list_of_weights):
         self.weights[matrix_of_weights_id] = \
-            self.MatrixOfWeights(matrix_of_weights_id, layer_id_first, layer_id_second, self).createMatrix(list_of_weights)
+            self.MatrixOfWeights(matrix_of_weights_id, layer_id_first, layer_id_second, self).createMatrix(
+                list_of_weights)
 
     ##### MACRO NETWORK FUNCTIONS
 
@@ -90,7 +92,7 @@ class NeuralNetwork:
         matrix_layer_first = self.calc.Matrix().create(elements=[neuron.value for neuron in layer_first.neurons],
                                                        width=layer_first.count_of_neurons, height=1)
         matrix_layer_second = self.calc.Matrix().create(elements=[neuron.value for neuron in layer_second.neurons],
-                                                       width=layer_second.count_of_neurons, height=1)
+                                                        width=layer_second.count_of_neurons, height=1)
         return self.calc.getListFromMatrix(self.calc.diff(matrix_layer_first, matrix_layer_second))
 
     def trainWeightsLast(self, matrix_of_weights_id: str, delta_layer_ids: tuple, previous_layer_id: int):
@@ -107,13 +109,16 @@ class NeuralNetwork:
                                      width=previous_layer.count_of_neurons, height=1)
         deductible_p1 = self.calc.multiple(self.calc.transpose(previous_layer_matrix), delta_matrix)  # [Y(i)]T * dX(i)
         deductible = self.calc.multipleNum(matrix=deductible_p1,
-                                           num=self.weights[matrix_of_weights_id].learning_rate)  # α2 * [Y(i)]T * dX(i) W'(i)->a'
+                                           num=self.weights[
+                                               matrix_of_weights_id].learning_rate)  # α2 * [Y(i)]T * dX(i) W'(i)->a'
         new_weights = self.calc.diff(old_weights, deductible)  # W'(i) – α2 * [Y(i)]T * dX(i)
         self.weights[matrix_of_weights_id].matrix = new_weights.matrix
-        # self.weights[matrix_of_weights_id].matrix = self.calc.diff(self.weights[matrix_of_weights_id], deductible).matrix
+        # self.weights[matrix_of_weights_id].matrix =
+        # self.calc.diff(self.weights[matrix_of_weights_id], deductible).matrix
         # print("NEW WEIGHTS:\n", self.weights[matrix_of_weights_id].matrix, "\n")
 
-    def trainWeights(self, matrix_of_weights_first_id: str, matrix_of_weights_second_id: str, delta_layer_ids: tuple, previous_layer_id: int):
+    def trainWeights(self, matrix_of_weights_first_id: str, matrix_of_weights_second_id: str, delta_layer_ids: tuple,
+                     previous_layer_id: int):
         # W(i+1) = W(i) – α * [X(i)]T * dX(i) * [W'(i)]T
         old_weights_first = copy(self.weights[matrix_of_weights_first_id])  # W(i)
         old_weights_second_transposed = self.calc.transpose(copy(self.weights[matrix_of_weights_second_id]))  # [W'(i)]T
@@ -129,23 +134,25 @@ class NeuralNetwork:
 
         deductible_p1 = self.calc.multiple(self.calc.transpose(previous_layer_matrix), delta_matrix)  # [X(i)]T * dX(i)
         deductible_p2 = self.calc.multiple(deductible_p1, old_weights_second_transposed)  # [X(i)]T * dX(i) * [W'(i)]T
+        # α * [X(i)]T * dX(i) * [W'(i)]T  W(i)->a
         deductible = self.calc.multipleNum(matrix=deductible_p2,
-                                           num=self.weights[matrix_of_weights_first_id].learning_rate)  # α * [X(i)]T * dX(i) * [W'(i)]T  W(i)->a
+                                           num=self.weights[matrix_of_weights_first_id].learning_rate)
         new_weights = self.calc.diff(old_weights_first, deductible)  # W(i) – α * [X(i)]T * dX(i) * [W'(i)]T
         self.weights[matrix_of_weights_first_id].matrix = new_weights.matrix
 
     def normalizeWeights(self, matrix_of_weights_id: str):
         transposed_matrix = self.calc.transpose(self.weights[matrix_of_weights_id])
-
+        # values = self.calc.getListFromMatrix(self.weights[matrix_of_weights_id])
+        # average = statistics.mean(values)
+        # deviation = statistics.pstdev(values)
         for i in range(0, self.weights[matrix_of_weights_id].height):
             for j in range(0, self.weights[matrix_of_weights_id].width):
-                # module = 1
                 module = 1
-                # for k in transposed_matrix.matrix[j]:
-                #     module *= k
                 for k in transposed_matrix.matrix[j]:
                     module *= k
                 self.weights[matrix_of_weights_id].matrix[i][j] *= (module / len(transposed_matrix.matrix[j]))
+                # self.weights[matrix_of_weights_id].matrix[i][j] = (self.weights[matrix_of_weights_id].matrix[i][j] -
+                # (statistics.mean(values) / deviation))
 
     def calculateTotalRMSError(self, delta_layer_ids: tuple):
         # Е(q) = E(dX(q)i * dX(q)i), where 1<=i<=N
@@ -159,17 +166,15 @@ class NeuralNetwork:
 
     def trainNeuronNetwork(self, blocks):
         self.creatingNetwork(blocks=blocks)
-        # for _ in range(0, 3):
-        print(self.weights["2-3"])
-
         while self.total_error > self.max_allowable_error or self.total_error == 0:
             for block in blocks:
+                pass
                 self.trainingIteration(block)
-                print(self.weights["2-3"])
-                #print("ITERATION: ", self.quantity_of_iterarions, "\t errors sum: ", self.total_error,
-                #      "\t max_error: ", self.max_allowable_error, "\t current average error: ", self.total_error/len(blocks))
+                # print("ITERATION: ", self.quantity_of_iterations, "\t errors sum: ", self.total_error,
+                #     "\t max_error: ", self.max_allowable_error, "\t current average error: ",
+                #     self.total_error / len(blocks))
             # if self.total_error/len(blocks) < self.max_allowable_error:
-            if self.total_error/len(blocks) < self.max_allowable_error or self.quantity_of_iterarions > 500:
+            if self.total_error / len(blocks) < self.max_allowable_error or self.quantity_of_iterations > 500:
                 break
             self.total_error = 0
 
@@ -177,7 +182,7 @@ class NeuralNetwork:
         # create layers
         block_length = len(blocks[0])
         self.createLayer(layer_id=1, count_of_neurons=block_length)
-        self.createLayer(layer_id=2, count_of_neurons=int(block_length * 2))
+        self.createLayer(layer_id=2, count_of_neurons=int(block_length * 0.5))
         self.createLayer(layer_id=3, count_of_neurons=block_length)
         # crete matrices of weights 1-2/2-3
         self.createWeightsRandom(matrix_of_weights_id="1-2", layer_id_first=1, layer_id_second=2)
@@ -192,14 +197,15 @@ class NeuralNetwork:
         self.trainNeurons(layer_id_first=1, layer_id_second=2, matrix_of_weights_id="1-2")  # training 2 layer
         self.trainNeurons(layer_id_first=2, layer_id_second=3, matrix_of_weights_id="2-3")  # training 3 layer
 
-        self.trainWeights(matrix_of_weights_first_id="1-2", matrix_of_weights_second_id="2-3", delta_layer_ids=(1, 3), previous_layer_id=1)
+        self.trainWeights(matrix_of_weights_first_id="1-2", matrix_of_weights_second_id="2-3", delta_layer_ids=(1, 3),
+                          previous_layer_id=1)
         self.trainWeightsLast(matrix_of_weights_id="2-3", delta_layer_ids=(1, 3), previous_layer_id=2)
 
         self.normalizeWeights("1-2")
         self.normalizeWeights("2-3")
 
         self.total_error += self.calculateTotalRMSError(delta_layer_ids=(1, 3))
-        self.quantity_of_iterarions += 1
+        self.quantity_of_iterations += 1
 
     def runBlockThroughNN(self, block):
         self.fillLayer(layer_id=1, list_of_values=block)

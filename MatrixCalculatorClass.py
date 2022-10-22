@@ -58,7 +58,10 @@ class MatrixCalculator:
             for i in range(0, matrix_3_height):
                 for j in range(0, matrix_3_width):
                     for k in range(0, matrix_3_common_size):
+                        try:
                             matrix_3_elements[matrix_3_width * i + j] += matrix_1.matrix[i][k] * matrix_2.matrix[k][j]
+                        except Exception as _:
+                            pass
             result = self.Matrix().create(list(matrix_3_elements), width=matrix_3_width, height=matrix_3_height)
             return result
         else:
@@ -84,6 +87,14 @@ class MatrixCalculator:
             for value in row:
                 values.append(value)
         return values
+
+    def average(self, matrix: Matrix):
+        all_sum = 0
+        for _ in matrix.matrix:
+            for value in matrix.matrix:
+                all_sum += value
+        return all_sum / (matrix.width * matrix.height)
+
 
 ##### TESTS #####
 """

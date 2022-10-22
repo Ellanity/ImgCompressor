@@ -191,7 +191,7 @@ class ImageCompressor:
         row_index = 0
         pixel_index = 0
         for value in self.image_vector_restored:
-            self.image_array_restored[row_index][pixel_index][value_index % self.pixel_size] = value
+            self.image_array_restored[row_index][pixel_index][value_index % self.pixel_size] = 255 - value
             # print(value / 128)
             value_index += 1
             if value_index % self.pixel_size == 0:

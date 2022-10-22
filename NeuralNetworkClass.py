@@ -182,7 +182,7 @@ class NeuralNetwork:
         # create layers
         block_length = len(blocks[0])
         self.createLayer(layer_id=1, count_of_neurons=block_length)
-        self.createLayer(layer_id=2, count_of_neurons=int(block_length * 0.5))
+        self.createLayer(layer_id=2, count_of_neurons=int(block_length * 2))
         self.createLayer(layer_id=3, count_of_neurons=block_length)
         # crete matrices of weights 1-2/2-3
         self.createWeightsRandom(matrix_of_weights_id="1-2", layer_id_first=1, layer_id_second=2)

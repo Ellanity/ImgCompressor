@@ -1,6 +1,6 @@
 from ImageCompressorClass import ImageCompressor
 
-block_sizes = (2, 2)
+block_sizes = (1, 1)
 image_file = "images/1.jpeg"
 
 compressed_image = ImageCompressor()

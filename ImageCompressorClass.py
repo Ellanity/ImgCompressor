@@ -22,13 +22,8 @@ class ImageCompressor:
         self.block_width = 0
         self.block_height = 0
         self.blocks = []
-
         self.nn = NeuralNetwork()
         self.compressed_blocks = []
-
-        self.matrix_of_weights_first = []
-        self.matrix_of_weights_second = []
-        self.count_of_neurons_on_second_layer = 0
         # restore
         self.vector_of_compressed_values = []
         self.image_vector_restored = []
@@ -130,12 +125,10 @@ class ImageCompressor:
                             pass  # print(ex)
                 # print("end block")
                 self.blocks.append(new_block)
-        # count of neurons on second layer
-        self.count_of_neurons_on_second_layer = len(self.blocks[0]) * 2
 
     # compress
     def __createNN(self):
-        rand_blocks = [random.choice(list(self.blocks)) for _ in range(0, 200)]
+        rand_blocks = [random.choice(list(self.blocks)) for _ in range(0, 1000)]
         self.nn.trainNeuronNetwork(list(rand_blocks))
 
     def __compressImageWithNN(self):
@@ -174,12 +167,10 @@ class ImageCompressor:
                             self.vector_of_compressed_values[i + j] = self.compressed_blocks[bi][bj]
                         except Exception as _:
                             pass  # print(ex)
-        # count of neurons on second layer
-        # print(self.image_vector_converted, "\n", self.vector_of_compressed_values)
 
     def __restoreValuesInImageArray(self):
         self.image_vector_restored = []
-        for value in self.image_vector:
+        for value in self.vector_of_compressed_values:
             new_value = 255 * ((value + 1) / 2)
             self.image_vector_restored.append(new_value)
 
@@ -191,7 +182,7 @@ class ImageCompressor:
         row_index = 0
         pixel_index = 0
         for value in self.image_vector_restored:
-            self.image_array_restored[row_index][pixel_index][value_index % self.pixel_size] = 255 - value
+            self.image_array_restored[row_index][pixel_index][value_index % self.pixel_size] = value  # 255 - value
             # print(value / 128)
             value_index += 1
             if value_index % self.pixel_size == 0:
@@ -203,5 +194,4 @@ class ImageCompressor:
     def __saveImage(self):
         new_ing = PilImg.fromarray(self.image_array_restored, self.image_mode)
         new_ing.show()
-        # new_ing = PilImg.fromarray(self.image_array_restored, "RGB")
-        new_ing.save(f'images/myimg-{datetime.datetime.now()}.png'.replace(":", "_"))
+        new_ing.save(f'{self.image_file_name}-{datetime.datetime.now()}.png'.replace(":", "_").replace(" ", "_"))

@@ -1,4 +1,5 @@
 # import statistics
+import math
 from copy import copy
 from random import random
 from MatrixCalculatorClass import MatrixCalculator
@@ -10,7 +11,7 @@ class NeuralNetwork:
         self.weights = {}
         self.calc = MatrixCalculator()
 
-        self.max_allowable_error = 0.7
+        self.max_allowable_error = 1
         self.total_error = 0
         self.quantity_of_iterations = 0
 
@@ -56,7 +57,7 @@ class NeuralNetwork:
             self.neurons_count_layer_first = self.neural_network.layers[self.layer_id_first].count_of_neurons
             self.neurons_count_layer_second = self.neural_network.layers[self.layer_id_second].count_of_neurons
 
-            self.learning_rate = random() / 1000
+            self.learning_rate = random() / 100
 
         def createMatrix(self, list_of_weights: list):
             values = list_of_weights
@@ -147,10 +148,11 @@ class NeuralNetwork:
         # deviation = statistics.pstdev(values)
         for i in range(0, self.weights[matrix_of_weights_id].height):
             for j in range(0, self.weights[matrix_of_weights_id].width):
-                module = 1
+                sqsum = 0
                 for k in transposed_matrix.matrix[j]:
-                    module *= k
-                self.weights[matrix_of_weights_id].matrix[i][j] *= (module / len(transposed_matrix.matrix[j]))
+                    sqsum += k * k
+                module = math.sqrt(sqsum)
+                self.weights[matrix_of_weights_id].matrix[i][j] /= module #/ len(transposed_matrix.matrix[j]))
                 # self.weights[matrix_of_weights_id].matrix[i][j] = (self.weights[matrix_of_weights_id].matrix[i][j] -
                 # (statistics.mean(values) / deviation))
 
@@ -168,7 +170,6 @@ class NeuralNetwork:
         self.creatingNetwork(blocks=blocks)
         while self.total_error > self.max_allowable_error or self.total_error == 0:
             for block in blocks:
-                pass
                 self.trainingIteration(block)
                 # print("ITERATION: ", self.quantity_of_iterations, "\t errors sum: ", self.total_error,
                 #     "\t max_error: ", self.max_allowable_error, "\t current average error: ",
@@ -189,7 +190,7 @@ class NeuralNetwork:
         weights = self.calc.getListFromMatrix(self.calc.transpose(self.weights["1-2"]))
         self.createWeights(matrix_of_weights_id="2-3", layer_id_first=2, layer_id_second=3, list_of_weights=weights)
 
-        self.max_allowable_error *= block_length
+        self.max_allowable_error *= block_length  # * len(blocks)
 
     def trainingIteration(self, block):
         self.fillLayer(layer_id=1, list_of_values=block)

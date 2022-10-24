@@ -1,6 +1,7 @@
 import datetime
 import random
 import math
+from pathlib import Path
 
 import matplotlib.image as img
 import PIL.Image as PilImg
@@ -23,35 +24,38 @@ class ImageCompressor:
         self.block_height = 0
         self.blocks = []
         self.nn = NeuralNetwork()
+        self.quantity_of_blocks_for_nn = 1024
         self.compressed_blocks = []
         # restore
         self.vector_of_compressed_values = []
         self.image_vector_restored = []
         self.image_array_restored = []
 
-    def compressImage(self, image, block_sizes):
+    def compressImage(self, image, block_sizes, quantity_of_blocks_for_nn):
         # init
         print("set image")
         self.__setImageFile(image)
         self.__setBlocksSizes(block_sizes)
         # convert img to vector of values
-        print("convert image")
+        print("convert image pixels values")
         self.__getImageArray()
         self.__straightenImageArray()
         self.__convertValuesInImageArray()
         # convert vector in vector of blocks/vectors
-        print("split image")
+        print("split image to blocks")
         self.__splitImageArrayIntoBlocks()
         # work with nn
         print("create and train nn")
-        self.__createNN()
+        self.__createNN(quantity_of_blocks_for_nn)
         print("compress image")
         self.__compressImageWithNN()
         # self.compressed_blocks = self.blocks
         # restore
-        print("restore image")
+        print("restore image from blocks")
         self.__restoreArrayFromBlocks()
+        print("restore values of pixels")
         self.__restoreValuesInImageArray()
+        print("restore picture")
         self.__collapseRestoredArray()
         self.__saveImage()
 
@@ -127,8 +131,9 @@ class ImageCompressor:
                 self.blocks.append(new_block)
 
     # compress
-    def __createNN(self):
-        rand_blocks = [random.choice(list(self.blocks)) for _ in range(0, 1000)]
+    def __createNN(self, quantity_of_blocks_for_nn=1024):
+        self.quantity_of_blocks_for_nn = quantity_of_blocks_for_nn
+        rand_blocks = [random.choice(list(self.blocks)) for _ in range(0, quantity_of_blocks_for_nn)]
         self.nn.trainNeuronNetwork(list(rand_blocks))
 
     def __compressImageWithNN(self):
@@ -194,4 +199,5 @@ class ImageCompressor:
     def __saveImage(self):
         new_ing = PilImg.fromarray(self.image_array_restored, self.image_mode)
         new_ing.show()
-        new_ing.save(f'{self.image_file_name}-{datetime.datetime.now()}.png'.replace(":", "_").replace(" ", "_"))
+        Path(f"images/{Path(self.image_file_name).stem}").mkdir(parents=True, exist_ok=True)
+        new_ing.save(f'images/{Path(self.image_file_name).stem}/{datetime.datetime.now()}.png'.replace(":", "_").replace(" ", "_"))

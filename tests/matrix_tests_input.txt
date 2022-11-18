@@ -1,0 +1,28 @@
+matrix_1 = Matrix(3, 3, [9, 3, 5, 2, 0, 3, 0, 1, -6])
+matrix_2 = Matrix(3, 3, [1, -1, -1, -1, 4, 7, 8, 1, -1])
+matrix_3 = Matrix(2, 3, [1, 2, 3, 4, 5, 6])
+
+print(matrix_1)
+print(matrix_2)
+print(matrix_3)
+
+print(matrix_1 + matrix_2)
+print(matrix_1 - matrix_2)
+print(matrix_1 * matrix_2)
+print(matrix_3.transpose())
+print(matrix_3 * 3.2)
+
+matrix_4 = Matrix(2, 2, [1, -1, -1, 1])
+matrix_5 = Matrix(3, 2, [1, 2, 3, 3, 2, 1])
+
+print(matrix_4)
+print(matrix_5)
+print(matrix_4 * matrix_5)
+
+matrix_6 = Matrix(3, 2, [2, 4, 1, 1, 0, -2])
+matrix_7 = Matrix(3, 3, [7, 3, 2, 4, 1, 0, 2, -1, 6])
+
+print(matrix_6)
+print(matrix_7)
+print(matrix_6 * matrix_7)
+print(matrix_6.transpose(), matrix_7.transpose())

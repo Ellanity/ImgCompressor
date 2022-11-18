@@ -1,8 +1,67 @@
 from ImageCompressorClass import ImageCompressor
+"""
+block_sizes = (64, 64)
+image_file = "images/64x64.png"
+quantity_of_blocks_for_nn = 1
 
-block_sizes = (1, 1)
-image_file = "images/256x256.jpg"
-quantity_of_blocks_for_nn = 1024
+compressor = ImageCompressor()
+compressor.compressImage(image_file, block_sizes, quantity_of_blocks_for_nn)
+"""
 
-compressed_image = ImageCompressor()
-compressed_image.compressImage(image_file, block_sizes, quantity_of_blocks_for_nn)
+"""
+from ImageClass import Image
+
+img = Image("images/1.jpeg")
+img.splitImageChannelsIntoBlocks(block_width=5, block_height=5)
+img.restoreChannelsFromBlocks(block_width=5, block_height=5)
+img.restoreImageFromChannels()
+img.saveImage()
+"""
+
+
+compressor = ImageCompressor()
+# compressor.setImage(image_name="images/small/5x5.jpg")
+# compressor.setImage(image_name="images/example.png")
+compressor.setImage(image_name="images/1.jpeg")
+compressor.setBlockSize(block_width=2, block_height=2)
+compressor.setQuantityOfBlocksToTrainNeuralNetwork(5)
+compressor.compressImage()
+
+"""
+
+from MatrixClass import Matrix
+
+matrix_1 = Matrix(2, 2, [0.2, 0.4, 0.3, 0.5])
+matrix_2 = Matrix(1, 2, [-0.093, -0.1576])
+matrix_3 = Matrix(2, 1, [1.0049, -0.9812])
+
+a = 0.001
+
+print(matrix_1 - (matrix_2 * matrix_3) * a)
+print(matrix_2 * matrix_3)
+print((matrix_2 * matrix_3) * a)
+"""
+
+"""
+layers: [0.5, 0.2, -0.2, 0.6] [0.6047897756590072, 0.6623382744053711, 0.4591869216065173, 0.4933734094873933] [1.2937330065492978, 0.8420973345520675, 0.36758994123395555, 1.4892713456906244]
+weights 1: 0.67316634500263	0.4288298111765949	0.4934643926473097	0.3456080991401497	
+0.6404763680401415	0.437220194620919	0.34843380975634347	0.52651913888902	
+0.9171158912024041	0.1670209725886445	0.3488861493319672	0.09633738435247023	
+0.5392241796502412	0.6564725406843646	0.35424198866331197	0.3908883483500141	
+ weights 2: 0.638548680530183	0.3876827519602774	0.33355848554330325	0.5750620863417498	
+0.476479264595872	0.30967312242531503	0.07181839196476016	0.8197024986134474	
+0.720400811591355	0.3242261761892044	0.1958383966450801	0.5809882784804942	
+0.529327692539388	0.5140974033140441	0.057487247499238156	0.6724665569317523	
+
+
+trainNeurons: 
+2 3 
+0.10174192297728932	0.49290267838843477	0.10406350573048437	0.6502745218746209
+
+0.840786792218013	0.6496357950761327	0.7148296994249242	1.0730525636368498	
+
+0.9758014076035626	0.9898573395689013	0.4410273014489686	0.013007679745487888	
+0.1362866098068265	0.2912509825989631	0.5657375673699548	0.8238063421659895	
+0.3290853085044846	0.7020806944470119	0.6104063632819239	0.19546289451168974	
+0.9843305452435616	0.511024847077031	0.5037628484055261	0.9923996850677588	
+"""

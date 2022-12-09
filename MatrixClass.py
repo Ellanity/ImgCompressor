@@ -41,7 +41,7 @@ class Matrix:
         if isinstance(other, Matrix):
             if self.width != other.height:
                 raise Exception(f"Matrix multiplication is not possible. The sizes of the matrices do not match. "
-                                f"self height = {self.width}, other width = {other.height}")
+                                f"self width = {self.width}, other height = {other.height}")
             new_matrix_width = other.width
             new_matrix_height = self.height
             new_matrix_elements = [0] * (self.height * other.width)

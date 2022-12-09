@@ -16,7 +16,7 @@ class NN:
 
         self.otherVariables: dict = {}
         self.block_size: int = 0
-        self.coeff_quantity_neurons_second_layer: float = 2
+        self.compression_rate: float = 2
         self.learning_rate: float = 0
         self.maxRMS: float = 0
         self.totalRMS: float = 0
@@ -29,34 +29,35 @@ class NN:
         if self.otherVariables == {}:
             return
         # Set variables to create network
-        self.coeff_quantity_neurons_second_layer = self.otherVariables["coeff_quantity_neurons_second_layer"]
+        self.compression_rate = self.otherVariables["compression_rate"]
         self.block_size = self.otherVariables["block_width"] * self.otherVariables["block_height"]
-        self.maxRMS = 0.1 * self.coeff_quantity_neurons_second_layer * self.block_size * 4
-        self.can_load_weights = self.otherVariables["can_load_weights"]
         # Correct formula for calculating maxRMS (use [* 4]s to speed up tests):
-        # self.maxRMS = 0.1 * self.coeff_quantity_neurons_second_layer * self.block_size
+        # self.maxRMS = 0.1 * self.compression_rate * self.block_size
+        self.maxRMS = 0.1 * self.compression_rate * self.block_size * 4
+        self.can_load_weights = self.otherVariables["can_load_weights"]
         self.learning_rate = self.otherVariables["learning_rate"]
         # Create weights matrices
         elements = []
-        for _ in range(int(self.block_size * self.block_size * self.coeff_quantity_neurons_second_layer)):
+        for _ in range(int(self.block_size * math.ceil(self.block_size * self.compression_rate))):
             elements.append(randint(int(-1e5), int(1e5)) / 1e5)
 
         if self.can_load_weights:
-            self.loadWeights()
+            self.__loadWeights()
         if not self.loaded_weights:
-            self.weights_1 = Matrix(width=self.block_size * self.coeff_quantity_neurons_second_layer,
-                                        height=self.block_size, elements=elements)
+            self.weights_1 = Matrix(width=math.ceil(self.block_size * self.compression_rate),
+                                    height=self.block_size, elements=elements)
             self.weights_2 = self.weights_1.transpose()
+        print("Neural network created successfully")
 
     def trainNN(self, blocks):
         block_size = len(blocks[0])
 
         if self.loaded_weights:
             coeff_Z = (self.block_size * len(blocks)) / \
-                      ((self.block_size + len(blocks)) * self.block_size * self.coeff_quantity_neurons_second_layer + 2)
+                      ((self.block_size + len(blocks)) * self.block_size * self.compression_rate + 2)
             print(f"Compression ratio: {coeff_Z}")
             return
-        while self.totalRMS > self.maxRMS or self.totalRMS == 0:
+        while self.totalRMS > self.maxRMS or (self.totalRMS == 0 and self.train_iteration_num == 0):
             self.totalRMS = 0
             for block_index in range(len(blocks)):
                 # Create layers
@@ -81,8 +82,9 @@ class NN:
                       f"Iterations: {self.train_iteration_num}", end="")
         print("\r")
         coeff_Z = (self.block_size * len(blocks)) /\
-                  ((self.block_size + len(blocks)) * self.block_size * self.coeff_quantity_neurons_second_layer + 2)
+                  ((self.block_size + len(blocks)) * self.block_size * self.compression_rate + 2)
         print(f"Compression ratio: {coeff_Z}")
+        self.__saveWeights()
 
     def normalizeWeights(self, weights):
         for i in range(0, weights.height):
@@ -109,22 +111,27 @@ class NN:
             self.layer_3.matrix[0][index] = -1 if self.layer_3.matrix[0][index] < -1 else self.layer_3.matrix[0][index]
             self.layer_3.matrix[0][index] = 1 if self.layer_3.matrix[0][index] > 1 else self.layer_3.matrix[0][index]
 
-        return copy.deepcopy(self.layer_3.getList())
+        return {
+            "compressed": copy.deepcopy(self.layer_2.getList()),
+            "final": copy.deepcopy(self.layer_3.getList())
+        }
 
     def getWeightsFileName(self, weights_index):
         try:
             image_name = Path(self.otherVariables['image_name']).stem
             return f"weights/{image_name}/" \
+                   f"{self.otherVariables['image_width']}_" \
+                   f"{self.otherVariables['image_height']}_" \
                    f"{self.otherVariables['count_of_channels']}_" \
                    f"{self.otherVariables['block_width']}_" \
                    f"{self.otherVariables['block_height']}_" \
-                   f"{self.otherVariables['coeff_quantity_neurons_second_layer']}_" \
+                   f"{self.otherVariables['compression_rate']}_" \
                    f"{self.otherVariables['channel_id']}_" \
                    f"{weights_index}.nnwght"
         except Exception as ex:
             print(ex)
 
-    def saveWeights(self):
+    def __saveWeights(self):
         try:
             image_name = Path(self.otherVariables['image_name']).stem
             Path(f"weights/{image_name}").mkdir(parents=True, exist_ok=True)
@@ -144,12 +151,14 @@ class NN:
         except Exception as ex:
             print(ex)
 
-    def loadWeights(self):
+    def __loadWeights(self):
+        if self.can_load_weights is not True:
+            print("Weights will not be loaded")
+            return
         try:
             file_name_1 = self.getWeightsFileName(weights_index=1)
             file_name_2 = self.getWeightsFileName(weights_index=2)
-            if os.path.exists(file_name_1) and \
-                    os.path.exists(file_name_2):
+            if os.path.exists(file_name_1) and os.path.exists(file_name_2):
                 with open(file_name_1, "r") as file:
                     elements = []
                     height = 0

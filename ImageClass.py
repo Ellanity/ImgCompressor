@@ -82,9 +82,11 @@ class Image:
                     for number_of_row_in_block in range(0, block_height):
                         for number_of_column_in_block in range(0, block_width):
                             try:
-                                element = self.matrix[first_row_of_block + number_of_row_in_block][first_column_of_block + number_of_column_in_block]
+                                row = first_row_of_block + number_of_row_in_block
+                                column = first_column_of_block + number_of_column_in_block
+                                element = self.matrix[row][column]
                                 element = (2 * element / 255) - 1
-                                element = round(element, 1)
+                                # element = round(element, 1)
                                 new_block.append(element)
                             except Exception as ex:
                                 print(ex)
@@ -116,6 +118,7 @@ class Image:
                                 channel_j = first_column_of_block + number_of_column_in_block
                                 element = self.blocks[block_num][element_in_block_num]
                                 element = 255 * ((element + 1) / 2)
+                                # print(element)
                                 self.matrix[channel_i][channel_j] = element
                             except Exception as ex:
                                 print(ex)
@@ -129,26 +132,29 @@ class Image:
             channel.restoreChannelFromBlocks(block_width=block_width, block_height=block_height)
 
     def restoreImageFromChannels(self):
-        """pixels_array_compressed = []
+        pixels_array = []
         for row_index in range(0, self.height):
-            pixels_array_compressed.append([])
+            pixels_array.append([])
             for pixel_index in range(0, self.width):
-                pixels_array_compressed[row_index].append([])
+                pixels_array[row_index].append([])
                 for channel_index in range(0, self.number_of_channels):
-                    pixels_array_compressed[row_index][pixel_index].append([])
-        self.pixels_array = pixels_array_compressed
+                    pixels_array[row_index][pixel_index].append(0)
         for row_index in range(0, self.height):
             for pixel_index in range(0, self.width):
                 for channel_index in range(0, self.number_of_channels):
-                    self.pixels_array[row_index][pixel_index][channel_index] = \
-                        self.channels[channel_index].matrix[row_index][pixel_index]
-        self.pixels_array = numpy.array(self.pixels_array)"""
+                    pixels_array[row_index][pixel_index][channel_index] = \
+                        int(self.channels[channel_index].matrix[row_index][pixel_index])
+        self.pixels_array = numpy.array(pixels_array).astype(numpy.uint8)
 
+        """
+        print("standard variant")
         for row_index in range(0, self.height):
             for pixel_index in range(0, self.width):
                 for channel_index in range(0, self.number_of_channels):
                     self.pixels_array[row_index][pixel_index][channel_index] = \
                         self.channels[channel_index].matrix[row_index][pixel_index]
+        print(self.pixels_array)
+        """
 
     def __getNewImageName(self):
         self.new_name = \
@@ -157,13 +163,13 @@ class Image:
             f'{self.otherVariables["block_width"]}_' \
             f'{self.otherVariables["block_height"]}_' \
             f'{datetime.datetime.now()}.png'.replace(":", "_").replace(" ", "_")
+        return self.new_name
 
     def saveImage(self):
         new_img = PilImg.fromarray(self.pixels_array, self.mode)
         new_img.show()
         Path(f"images/{Path(self.file_name).stem}").mkdir(parents=True, exist_ok=True)
-        print(f'images/{Path(self.file_name).stem}/{self.new_name}')
-        new_img.save(f'images/{Path(self.file_name).stem}/{self.new_name}')
+        new_img.save(f"images/{Path(self.file_name).stem}/{self.new_name}")
 
     def saveImageCompressedVersion(self):
         new_img_height = len(self.channels_compressed[0][0])
@@ -183,8 +189,8 @@ class Image:
                     element = self.channels_compressed[channel_index][pixel_index][row_index]
                     element = 255 * ((element + 1) / 2)
                     pixels_array_compressed[row_index][pixel_index][channel_index] = element
-
+        pixels_array_compressed = numpy.array(pixels_array_compressed).astype(numpy.uint8)
         new_img = PilImg.fromarray(numpy.array(pixels_array_compressed), self.mode)
         new_img.show()
         Path(f"images/{Path(self.file_name).stem}/compressed/").mkdir(parents=True, exist_ok=True)
-        new_img.save(f'images/{Path(self.file_name).stem}/compressed/{self.new_name}')
+        new_img.save(f"images/{Path(self.file_name).stem}/compressed/{self.new_name}")

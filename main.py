@@ -5,21 +5,22 @@ from NNClass import NN, Matrix
 
 def uncompressImage():
     # User input
-    # image_file_name = input("Image file name: ")
-    image_file_name = "images/5x5/compressed/5_5_0.7_3_3_2022-12-09_16_50_41.136921.png"  # \
-    #     if image_file_name == "" or image_file_name == "\n" else image_file_name
-    # image_file_name = "images/5x5/compressed/5_5_0.7_3_3_2022-12-09_15_12_18.480793.png"
+    image_file_name = input("Image file name: ")
+    image_file_name = "images/5x5/compressed/5_5_0.7_3_3_2022-12-10_02_34_58.875684.png" \
+        if image_file_name == "" or image_file_name == "\n" else image_file_name
     image = Image(image_file_name)
     image.splitImageChannelsIntoBlocks(block_width=1, block_height=image.height)
     splited_path = image_file_name.split("/")
     splited_image_name = None
     try:
         splited_image_name = splited_path[3].split("_")
-    except Exception as ex:
+    except Exception as _:
         splited_image_name = splited_path[2].split("_")
+
     if splited_image_name is None:
         print("File name format is incorrect")
         return
+
     image.width = int(splited_image_name[0])
     image.height = int(splited_image_name[1])
     NNVariables = {
@@ -32,25 +33,25 @@ def uncompressImage():
         "can_load_weights": True
     }
     image.setNNVariables(NNVariables)
+    # print("uncompressed")
+    # _ = [print(channel.blocks) for channel in image.channels]
 
     for channel in image.channels:
         channel_NN = NN()
         NNVariables["channel_id"] = image.channels.index(channel)
         NNVariables["count_of_channels"] = len(image.channels)
         channel_NN.createNN(NNVariables)
-
         blocks_output = []
         for block in channel.blocks:
-            # print(block)
             layer_2 = Matrix(width=len(block), height=1, elements=block)
             blocks_output.append((layer_2 * channel_NN.weights_2).getList())
-
         channel.blocks = blocks_output
         channel.width = int(splited_image_name[0])
         channel.height = int(splited_image_name[1])
         channel.matrix = [[0] * channel.width for _ in range(channel.height)]
-        # print(channel.matrix)
-
+        # channel.restoreChannelFromBlocks(block_width=NNVariables["block_width"],
+        #                                  block_height=NNVariables["block_height"])
+        # print(*channel.blocks)
     image.restoreChannelsFromBlocks(block_width=NNVariables["block_width"],
                                     block_height=NNVariables["block_height"])
     image.restoreImageFromChannels()
@@ -144,19 +145,23 @@ def compressImage():
         channel.blocks = [block["final"] for block in iterated_blocks]
         image.channels_compressed[image.channels.index(channel)] = [block["compressed"] for block in iterated_blocks]
 
+    # print("compressed")
+    # _ = [print(channel) for channel in image.channels_compressed]
     # Restore and save image and save compressed image
     image.restoreChannelsFromBlocks(NNVariables["block_width"], NNVariables["block_height"])
     image.restoreImageFromChannels()
     image.saveImage()
     image.saveImageCompressedVersion()
-    print(image.channels_compressed[0])
+    # print(image.pixels_array)
+
     # Literature:
     # https://studfile.net/preview/1557061/page:8/
 
 
 def main():
+    """
     main_program_flow = 0
-    """while main_program_flow != "1" and main_program_flow != "2":
+    while main_program_flow != "1" and main_program_flow != "2":
         # main_program_flow = input("What do you want to do:\n1 - compress image\n2 - uncompress image\n")
         main_program_flow = "1"
     if main_program_flow == "1":
@@ -165,7 +170,8 @@ def main():
         uncompressImage()
     else:
         print("Exit program")
-        exit()"""
+        exit()
+    """
     compressImage()
     # uncompressImage()
 

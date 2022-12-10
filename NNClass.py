@@ -61,15 +61,16 @@ class NN:
             self.totalRMS = 0
             for block_index in range(len(blocks)):
                 # Create layers
-                self.layer_1 = Matrix(width=block_size, height=1, elements=blocks[block_index])
-                self.layer_2 = self.layer_1 * self.weights_1
-                self.layer_3 = self.layer_2 * self.weights_2
+                self.layer_1: Matrix = Matrix(width=block_size, height=1, elements=blocks[block_index])
+                self.layer_2: Matrix = self.layer_1 * self.weights_1
+                self.layer_3: Matrix = self.layer_2 * self.weights_2
                 # Calculate rms and delta between first and last layer
                 delta_layers13: Matrix = self.layer_3 - self.layer_1
                 rms = sum([value * value for value in delta_layers13.getList()])
                 self.totalRMS += rms
                 # Update weights
-                new_weights1 = self.weights_1 - (self.layer_1.transpose() * delta_layers13 * self.weights_2.transpose()) * self.learning_rate
+                new_weights1 = self.weights_1 - (self.layer_1.transpose() * delta_layers13 *
+                                                 self.weights_2.transpose()) * self.learning_rate
                 new_weights2 = self.weights_2 - (self.layer_2.transpose() * delta_layers13) * self.learning_rate
                 self.weights_1 = new_weights1
                 self.weights_2 = new_weights2
@@ -128,8 +129,8 @@ class NN:
                    f"{self.otherVariables['compression_rate']}_" \
                    f"{self.otherVariables['channel_id']}_" \
                    f"{weights_index}.nnwght"
-        except Exception as ex:
-            print(ex)
+        except Exception as _:
+            pass
 
     def __saveWeights(self):
         try:
@@ -178,5 +179,5 @@ class NN:
                 self.loaded_weights = True
             else:
                 print("No weights for this parameters")
-        except Exception as ex:
-            print(ex)
+        except Exception as _:
+            pass

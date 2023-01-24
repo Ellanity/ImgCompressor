@@ -170,6 +170,7 @@ class Image:
         new_img.show()
         Path(f"images/{Path(self.file_name).stem}").mkdir(parents=True, exist_ok=True)
         new_img.save(f"images/{Path(self.file_name).stem}/{self.new_name}")
+        print(f"Saved {self.new_name}")
 
     def saveImageCompressedVersion(self):
         new_img_height = len(self.channels_compressed[0][0])
@@ -191,6 +192,7 @@ class Image:
                     pixels_array_compressed[row_index][pixel_index][channel_index] = element
         pixels_array_compressed = numpy.array(pixels_array_compressed).astype(numpy.uint8)
         new_img = PilImg.fromarray(numpy.array(pixels_array_compressed), self.mode)
-        new_img.show()
+        # new_img.show()
         Path(f"images/{Path(self.file_name).stem}/compressed/").mkdir(parents=True, exist_ok=True)
         new_img.save(f"images/{Path(self.file_name).stem}/compressed/{self.new_name}")
+        print(f"Saved compressed {self.new_name}")

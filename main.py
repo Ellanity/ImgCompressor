@@ -62,26 +62,26 @@ def compressImage():
     random.seed()
     # User input
     image_file_name = input("Image file name: ")
-    # image_file_name = "images/256x256_0.png" if image_file_name == "" or image_file_name == "\n" else image_file_name
-    image_file_name = "images/5x5.jpg" if image_file_name == "" or image_file_name == "\n" else image_file_name
+    image_file_name = "images/256x256_0.png" if image_file_name == "" or image_file_name == "\n" else image_file_name
+    # image_file_name = "images/5x5.jpg" if image_file_name == "" or image_file_name == "\n" else image_file_name
 
     block_width = input("Block width: ")
-    block_width = 3 if block_width == "" or block_width == "\n" else int(block_width)
+    block_width = 2 if block_width == "" or block_width == "\n" else int(block_width)
 
     block_height = input("Block height: ")
-    block_height = 3 if block_height == "" or block_height == "\n" else int(block_height)
+    block_height = 2 if block_height == "" or block_height == "\n" else int(block_height)
 
     compression_rate = input("Coeff of quantity of neurons on the second layer: ")
-    compression_rate = 0.7 if compression_rate == "" or compression_rate == "\n" else float(compression_rate)
+    compression_rate = 0.9 if compression_rate == "" or compression_rate == "\n" else float(compression_rate)
 
     learning_rate = input("Learning rate: ")
     learning_rate = 0.0001 if learning_rate == "" or learning_rate == "\n" else float(learning_rate)
 
-    # can_load_weights = input("Load saved weights [y/n]: ")
-    # can_load_weights = True if can_load_weights.lower() == "y" or can_load_weights.lower() == "y\n" else False
+    can_load_weights = input("Load saved weights [y/n]: ")
+    can_load_weights = True if can_load_weights.lower() == "y" or can_load_weights.lower() == "y\n" else False
 
     # !!!Only for dev always True/False
-    can_load_weights = True
+    # can_load_weights = True
 
     NNVariables = {
         "image_name": image_file_name,
